@@ -1,10 +1,17 @@
 import { NavLink } from "react-router-dom"
-import { ShoppingBag, Instagram, MessageCircle, Menu, X } from "lucide-react"
-import { useState } from "react"
+import {
+  ShoppingBag,
+  Instagram,
+  MessageCircle,
+  Menu,
+  X
+} from "lucide-react"
+import { useState, useRef } from "react"
 import logo from "../assets/images/logo.png"
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
+  const touchStartX = useRef(0)
 
   const links = [
     { to: "/", label: "Home" },
@@ -13,36 +20,41 @@ export default function Navbar() {
     { to: "/contact", label: "Contact" },
   ]
 
+  // Swipe handlers
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX
+  }
+
+  const handleTouchEnd = (e) => {
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current
+    if (deltaX < -60) setOpen(false) // swipe left to close
+  }
+
   return (
     <>
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-white border-b">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setOpen(true)}
-          >
+          {/* Mobile menu */}
+          <button className="md:hidden" onClick={() => setOpen(true)}>
             <Menu className="w-6 h-6" />
           </button>
 
           {/* Logo */}
           <NavLink to="/">
-            <img src={logo} alt="YOUR BRAND Logo" className="h-23 w-36" />
+            <img src={logo} alt="Brand Logo" className="h-23 w-36" />
           </NavLink>
 
-          {/* Desktop Links */}
-          <div className="hidden md:flex items-center space-x-8 text-sm font-medium">
+          {/* Desktop links */}
+          <div className="hidden md:flex space-x-8 text-sm font-medium">
             {links.map(link => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) =>
-                  `relative px-2 py-1 font-semibold transition-all duration-300
-                  text-neutral-600 hover:text-gray-800
-                  hover:shadow-lg hover:-translate-y-[2px] hover:scale-105
-                  ${isActive ? "text-black" : ""}`
+                  `font-semibold transition
+                  ${isActive ? "text-black" : "text-neutral-600 hover:text-black"}`
                 }
               >
                 {link.label}
@@ -51,53 +63,38 @@ export default function Navbar() {
           </div>
 
           {/* Icons */}
-          <div className="flex items-center gap-3">
-            <NavLink
-              to="/shop"
-              className="group p-2 rounded-full transition hover:bg-black hover:text-white"
-            >
-              <ShoppingBag className="w-5 h-5 group-hover:scale-110" />
-            </NavLink>
-
-            <a
-              href="https://instagram.com/yourbrand"
-              target="_blank"
-              className="group p-2 rounded-full transition hover:bg-pink-600 hover:text-white"
-            >
-              <Instagram className="w-5 h-5 group-hover:scale-110" />
-            </a>
-
-            <a
-              href="https://wa.me/254700401188"
-              target="_blank"
-              className="group p-2 rounded-full transition hover:bg-green-600 hover:text-white"
-            >
-              <MessageCircle className="w-5 h-5 group-hover:scale-110" />
-            </a>
+          <div className="flex gap-3">
+            <ShoppingBag className="w-5 h-5" />
+            <Instagram className="w-5 h-5" />
+            <MessageCircle className="w-5 h-5" />
           </div>
         </div>
       </nav>
 
-      {/* Overlay */}
-      {open && (
-        <div
-          className="fixed inset-0 bg-black/40 z-40"
-          onClick={() => setOpen(false)}
-        />
-      )}
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 bg-black/40 z-40 transition-opacity duration-300
+        ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        onClick={() => setOpen(false)}
+      />
 
-      {/* Sidebar */}
+      {/* Drawer Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-white z-50 transform transition-transform duration-300
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        className={`fixed top-0 left-0 h-full w-72 bg-white z-50
+        transform transition-transform duration-300 ease-out
         ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <div className="p-5 flex items-center justify-between border-b">
-          <img src={logo} alt="logo" className="w-28" />
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 border-b">
+          <img src={logo} className="w-28" />
           <button onClick={() => setOpen(false)}>
             <X className="w-6 h-6" />
           </button>
         </div>
 
+        {/* Nav links */}
         <div className="flex flex-col p-6 space-y-4 text-lg font-medium">
           {links.map(link => (
             <NavLink
@@ -109,6 +106,35 @@ export default function Navbar() {
               {link.label}
             </NavLink>
           ))}
+        </div>
+
+        {/* Bottom Social Icons */}
+        <div className="absolute bottom-6 left-0 w-full px-6">
+          <div className="flex justify-around border-t pt-4">
+            <a
+              href="https://instagram.com/yourbrand"
+              target="_blank"
+              className="p-3 rounded-full bg-pink-100 text-pink-600"
+            >
+              <Instagram />
+            </a>
+
+            <a
+              href="https://wa.me/254700401188"
+              target="_blank"
+              className="p-3 rounded-full bg-green-100 text-green-600"
+            >
+              <MessageCircle />
+            </a>
+
+            <NavLink
+              to="/shop"
+              onClick={() => setOpen(false)}
+              className="p-3 rounded-full bg-neutral-100 text-black"
+            >
+              <ShoppingBag />
+            </NavLink>
+          </div>
         </div>
       </aside>
     </>
