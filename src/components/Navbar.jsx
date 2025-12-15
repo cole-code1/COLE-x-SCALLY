@@ -21,7 +21,7 @@ export default function Navbar() {
     { to: "/contact", label: "Contact" },
   ]
 
-  /* Auto close on route change */
+  /* Auto-close on route change */
   useEffect(() => {
     setOpen(false)
   }, [location.pathname])
@@ -33,7 +33,7 @@ export default function Navbar() {
 
   const onTouchEnd = (e) => {
     const deltaX = e.changedTouches[0].clientX - touchStartX.current
-    if (deltaX > 70) setOpen(false)
+    if (deltaX > 70) setOpen(false) // swipe right
   }
 
   return (
@@ -44,21 +44,17 @@ export default function Navbar() {
 
           {/* Logo */}
           <NavLink to="/">
-            <img
-              src={logo}
-              alt="Brand Logo"
-              className="h-12 w-auto glow-light"
-            />
+            <img src={logo} alt="Brand Logo" className="h-23 w-36" />
           </NavLink>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex space-x-8 text-sm font-semibold">
+          <div className="hidden md:flex space-x-8 text-sm font-medium">
             {links.map(link => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) =>
-                  `relative px-2 py-1 transition
+                  `relative px-2 py-1 transition font-semibold
                   ${isActive
                     ? "text-black after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-black"
                     : "text-neutral-600 hover:text-black"}`
@@ -73,7 +69,6 @@ export default function Navbar() {
           <button
             className="md:hidden p-2"
             onClick={() => setOpen(true)}
-            aria-label="Open Menu"
           >
             <Menu className="w-6 h-6" />
           </button>
@@ -99,12 +94,8 @@ export default function Navbar() {
       >
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-white/10">
-          <img
-            src={logo}
-            alt="Brand Logo"
-            className="w-28 invert glow-dark"
-          />
-          <button onClick={() => setOpen(false)} aria-label="Close Menu">
+          <img src={logo} className="w-28 invert" />
+          <button onClick={() => setOpen(false)}>
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -127,7 +118,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Bottom Icons */}
+        {/* Bottom Social Icons */}
         <div className="absolute bottom-6 w-full px-6">
           <div className="flex justify-around border-t border-white/10 pt-4">
             <a
